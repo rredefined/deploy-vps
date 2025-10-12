@@ -9,7 +9,7 @@ Run Vps environments with Docker using simple commands.
 git clone https://github.com/rredefined/deploy-vps.git
 cd deploy-vps
 pip install -r requirements.txt
-mv env..properties .env
+mv env.properties .env
 ```
 
 ---
