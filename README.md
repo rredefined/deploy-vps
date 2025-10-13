@@ -49,6 +49,7 @@ nano .env
 ### ▶️ Start the bot
 ```
 python3 bot.py
+help
 ```
 
 ---
