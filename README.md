@@ -62,4 +62,4 @@ help
 ---
 
 ## 📞 Discord: 
-[![Discord Presence](https://lanyard.cnrad.dev/api/969258536557244537)](https://discord.com/users/969258536557244537)
+[![Nightt.jss](https://discord.com/users/969258536557244537)
