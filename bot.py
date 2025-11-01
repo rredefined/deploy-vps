@@ -24,15 +24,12 @@ import sqlite3
 import pickle
 import base64
 import threading
-from flask
-import Flask, render_template, request, jsonify, session
-from flask_socketio 
-import SocketIO, emit
+from flask import Flask, render_template, request, jsonify, session
+from flask_socketio import SocketIO, emit
 import docker
 import paramiko
 import os
-from dotenv 
-import load_dotenv
+from dotenv import load_dotenv
 
 # Configure logging
 logging.basicConfig(
@@ -43,7 +40,7 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
-logger = logging.getLogger('StrengthCloudBot')
+logger = logging.getLogger('AxytehostBot')
 
 # Load environment variables
 load_dotenv()
@@ -53,7 +50,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 ADMIN_IDS = {int(id_) for id_ in os.getenv('ADMIN_IDS', '1210291131301101618').split(',') if id_.strip()}
 ADMIN_ROLE_ID = int(os.getenv('ADMIN_ROLE_ID', '1376177459870961694'))
 WATERMARK = "AltareHost VPS Service"
-WELCOME_MESSAGE = "Welcome To StrengthCloud! Get Started With Us!"
+WELCOME_MESSAGE = "Welcome To AltareHost! Get Started With Us!"
 MAX_VPS_PER_USER = int(os.getenv('MAX_VPS_PER_USER', '3'))
 DEFAULT_OS_IMAGE = os.getenv('DEFAULT_OS_IMAGE', 'ubuntu:22.04')
 DOCKER_NETWORK = os.getenv('DOCKER_NETWORK', 'bridge')
@@ -99,7 +96,7 @@ RUN mkdir /var/run/sshd && \\
 RUN systemctl enable ssh && \\
     systemctl enable docker
 
-# StrengthCloud customization
+# Axytehost customization
 RUN echo '{welcome_message}' > /etc/motd && \\
     echo 'echo "{welcome_message}"' >> /home/{username}/.bashrc && \\
     echo '{watermark}' > /etc/machine-info && \\
@@ -369,7 +366,7 @@ class Database:
         self.conn.close()
 
 # Initialize bot with command prefix '/'
-class StrengthCloudBot(commands.Bot):
+class AxytehostBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.db = Database(DB_FILE)
@@ -649,7 +646,7 @@ async def build_custom_image(vps_id, username, root_password, user_password, bas
             logger.error(f"Error cleaning up temp directory: {e}")
 
 async def setup_container(container_id, status_msg, memory, username, vps_id=None, use_custom_image=False):
-    """Enhanced container setup with StrengthCloud customization"""
+    """Enhanced container setup with Axytehost customization"""
     try:
         # Ensure container is running
         if isinstance(status_msg, discord.Interaction):
@@ -712,11 +709,11 @@ async def setup_container(container_id, status_msg, memory, username, vps_id=Non
                 if not success:
                     raise Exception(f"Failed to setup user: {output}")
 
-        # Set StrengthCloud customization
+        # Set Axytehost customization
         if isinstance(status_msg, discord.Interaction):
-            await status_msg.followup.send("🎨 Setting up StrengthCloud customization...", ephemeral=True)
+            await status_msg.followup.send("🎨 Setting up Axytehost customization...", ephemeral=True)
         else:
-            await status_msg.edit(content="🎨 Setting up StrengthCloud customization...")
+            await status_msg.edit(content="🎨 Setting up Axytehost customization...")
             
         # Create welcome message file
         welcome_cmd = f"echo '{WELCOME_MESSAGE}' > /etc/motd && echo 'echo \"{WELCOME_MESSAGE}\"' >> /home/{username}/.bashrc"
@@ -764,9 +761,9 @@ async def setup_container(container_id, status_msg, memory, username, vps_id=Non
                 logger.warning(f"Security setup command failed: {cmd} - {output}")
 
         if isinstance(status_msg, discord.Interaction):
-            await status_msg.followup.send("✅ StrengthCloud VPS setup completed successfully!", ephemeral=True)
+            await status_msg.followup.send("✅ Axytehost VPS setup completed successfully!", ephemeral=True)
         else:
-            await status_msg.edit(content="✅ StrengthCloud VPS setup completed successfully!")
+            await status_msg.edit(content="✅ Axytehost VPS setup completed successfully!")
             
         return True, ssh_password, vps_id
     except Exception as e:
@@ -781,7 +778,7 @@ async def setup_container(container_id, status_msg, memory, username, vps_id=Non
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
-bot = StrengthCloudBot(command_prefix='/', intents=intents, help_command=None)
+bot = AxytehostBot(command_prefix='/', intents=intents, help_command=None)
 
 @bot.event
 async def on_ready():
@@ -802,7 +799,7 @@ async def on_ready():
                     logger.error(f"Error starting container: {e}")
     
     try:
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="StrengthCloud VPS"))
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Axytehost VPS"))
         synced_commands = await bot.tree.sync()
         logger.info(f"Synced {len(synced_commands)} slash commands")
     except Exception as e:
@@ -926,7 +923,7 @@ async def list_admins(ctx):
     disk="Disk space in GB",
     owner="User who will own the VPS",
     os_image="OS image to use",
-    use_custom_image="Use custom StrengthCloud image (recommended)"
+    use_custom_image="Use custom Axytehost image (recommended)"
 )
 async def create_vps_command(ctx, memory: int, cpu: int, disk: int, owner: discord.Member, 
                            os_image: str = DEFAULT_OS_IMAGE, use_custom_image: bool = True):
@@ -970,7 +967,7 @@ async def create_vps_command(ctx, memory: int, cpu: int, disk: int, owner: disco
             await ctx.send(f"❌ {owner.mention} already has the maximum number of VPS instances ({bot.db.get_setting('max_vps_per_user')})", ephemeral=True)
             return
 
-        status_msg = await ctx.send("🚀 Creating StrengthCloud VPS instance... This may take a few minutes.")
+        status_msg = await ctx.send("🚀 Creating Axytehost VPS instance... This may take a few minutes.")
 
         memory_bytes = memory * 1024 * 1024 * 1024
         vps_id = generate_vps_id()
@@ -1048,7 +1045,7 @@ async def create_vps_command(ctx, memory: int, cpu: int, disk: int, owner: disco
                 )
                 os_image = DEFAULT_OS_IMAGE
 
-        await status_msg.edit(content="🔧 Container created. Setting up StrengthCloud environment...")
+        await status_msg.edit(content="🔧 Container created. Setting up Axytehost environment...")
         await asyncio.sleep(5)
 
         setup_success, ssh_password, _ = await setup_container(
@@ -1137,7 +1134,7 @@ async def list_vps(ctx):
             await ctx.send("You don't have any VPS instances.", ephemeral=True)
             return
 
-        embed = discord.Embed(title="Your StrengthCloud VPS Instances", color=discord.Color.blue())
+        embed = discord.Embed(title="Your Axytehost VPS Instances", color=discord.Color.blue())
         
         for vps in user_vps:
             try:
@@ -1182,7 +1179,7 @@ async def admin_list_vps(ctx):
             await ctx.send("No VPS instances found.", ephemeral=True)
             return
 
-        embed = discord.Embed(title="All StrengthCloud VPS Instances", color=discord.Color.blue())
+        embed = discord.Embed(title="All Axytehost VPS Instances", color=discord.Color.blue())
         valid_vps_count = 0
         
         for token, vps in all_vps.items():
@@ -1260,7 +1257,7 @@ async def delete_vps(ctx, vps_id: str):
         
         bot.db.remove_vps(token)
         
-        await ctx.send(f"✅ StrengthCloud VPS {vps_id} has been deleted successfully!")
+        await ctx.send(f"✅ Axytehost VPS {vps_id} has been deleted successfully!")
     except Exception as e:
         logger.error(f"Error in delete_vps: {e}")
         await ctx.send(f"❌ Error deleting VPS: {str(e)}")
@@ -1302,7 +1299,7 @@ async def connect_vps(ctx, token: str):
 
         bot.db.update_vps(token, {"tmate_session": ssh_session_line})
         
-        embed = discord.Embed(title="StrengthCloud VPS Connection Details", color=discord.Color.blue())
+        embed = discord.Embed(title="Axytehost VPS Connection Details", color=discord.Color.blue())
         embed.add_field(name="Username", value=vps["username"], inline=True)
         embed.add_field(name="SSH Password", value=f"||{vps.get('password', 'Not set')}||", inline=True)
         embed.add_field(name="Tmate Session", value=f"```{ssh_session_line}```", inline=False)
@@ -1310,14 +1307,14 @@ async def connect_vps(ctx, token: str):
 1. Copy the Tmate session command
 2. Open your terminal
 3. Paste and run the command
-4. You will be connected to your StrengthCloud VPS
+4. You will be connected to your Axytehost VPS
 
 Or use direct SSH:
 ```ssh {username}@<server-ip>```
 """.format(username=vps["username"]), inline=False)
         
         await ctx.author.send(embed=embed)
-        await ctx.send("✅ Connection details sent to your DMs! Use the Tmate command to connect to your StrengthCloud VPS.", ephemeral=True)
+        await ctx.send("✅ Connection details sent to your DMs! Use the Tmate command to connect to your Axytehost VPS.", ephemeral=True)
         
     except discord.Forbidden:
         await ctx.send("❌ I couldn't send you a DM. Please enable DMs from server members.", ephemeral=True)
@@ -1447,7 +1444,7 @@ async def admin_stats(ctx):
         # Get system stats
         stats = bot.system_stats
         
-        embed = discord.Embed(title="StrengthCloud System Statistics", color=discord.Color.blue())
+        embed = discord.Embed(title="Axytehost System Statistics", color=discord.Color.blue())
         embed.add_field(name="VPS Instances", value=f"Total: {len(bot.db.get_all_vps())}\nRunning: {len([c for c in containers if c.status == 'running'])}", inline=True)
         embed.add_field(name="Docker Containers", value=f"Total: {len(containers)}\nRunning: {len([c for c in containers if c.status == 'running'])}", inline=True)
         embed.add_field(name="CPU Usage", value=f"{stats['cpu_usage']}%", inline=True)
@@ -1650,7 +1647,7 @@ async def vps_usage(ctx):
         total_disk = sum(vps['disk'] for vps in user_vps)
         total_restarts = sum(vps.get('restart_count', 0) for vps in user_vps)
         
-        embed = discord.Embed(title="Your StrengthCloud VPS Usage", color=discord.Color.blue())
+        embed = discord.Embed(title="Your Axytehost VPS Usage", color=discord.Color.blue())
         embed.add_field(name="Total VPS Instances", value=len(user_vps), inline=True)
         embed.add_field(name="Total Memory Allocated", value=f"{total_memory}GB", inline=True)
         embed.add_field(name="Total CPU Cores Allocated", value=total_cpu, inline=True)
@@ -1676,7 +1673,7 @@ async def global_stats(ctx):
         total_disk = sum(vps['disk'] for vps in all_vps.values())
         total_restarts = sum(vps.get('restart_count', 0) for vps in all_vps.values())
         
-        embed = discord.Emembed(title="StrengthCloud Global Usage Statistics", color=discord.Color.blue())
+        embed = discord.Emembed(title="Axytehost Global Usage Statistics", color=discord.Color.blue())
         embed.add_field(name="Total VPS Created", value=bot.db.get_stat('total_vps_created'), inline=True)
         embed.add_field(name="Total Restarts", value=bot.db.get_stat('total_restarts'), inline=True)
         embed.add_field(name="Current VPS Instances", value=len(all_vps), inline=True)
@@ -2081,7 +2078,7 @@ async def reinstall_bot(ctx):
         return
 
     try:
-        await ctx.send("🔄 Reinstalling StrengthCloud bot... This may take a few minutes.")
+        await ctx.send("🔄 Reinstalling Axytehost bot... This may take a few minutes.")
         
         # Create Dockerfile for bot reinstallation
         dockerfile_content = f"""
@@ -2141,7 +2138,7 @@ class VPSManagementView(ui.View):
         if token:
             bot.db.remove_vps(token)
         
-        embed = discord.Embed(title=f"StrengthCloud VPS Management - {self.vps_id}", color=discord.Color.red())
+        embed = discord.Embed(title=f"Axytehost VPS Management - {self.vps_id}", color=discord.Color.red())
         embed.add_field(name="Status", value="🔴 Container Not Found", inline=True)
         embed.add_field(name="Note", value="This VPS instance is no longer available. Please create a new one.", inline=False)
         
@@ -2177,7 +2174,7 @@ class VPSManagementView(ui.View):
             if token:
                 bot.db.update_vps(token, {'status': 'running'})
             
-            embed = discord.Embed(title=f"StrengthCloud VPS Management - {self.vps_id}", color=discord.Color.green())
+            embed = discord.Embed(title=f"Axytehost VPS Management - {self.vps_id}", color=discord.Color.green())
             embed.add_field(name="Status", value="🟢 Running", inline=True)
             
             if vps:
@@ -2188,7 +2185,7 @@ class VPSManagementView(ui.View):
                 embed.add_field(name="Created", value=vps['created_at'], inline=True)
             
             await interaction.message.edit(embed=embed)
-            await interaction.followup.send("✅ StrengthCloud VPS started successfully!", ephemeral=True)
+            await interaction.followup.send("✅ Axytehost VPS started successfully!", ephemeral=True)
         except Exception as e:
             await interaction.followup.send(f"❌ Error starting VPS: {str(e)}", ephemeral=True)
 
@@ -2213,7 +2210,7 @@ class VPSManagementView(ui.View):
             if token:
                 bot.db.update_vps(token, {'status': 'stopped'})
             
-            embed = discord.Emembed(title=f"StrengthCloud VPS Management - {self.vps_id}", color=discord.Color.orange())
+            embed = discord.Emembed(title=f"Axytehost VPS Management - {self.vps_id}", color=discord.Color.orange())
             embed.add_field(name="Status", value="🔴 Stopped", inline=True)
             
             if vps:
@@ -2224,7 +2221,7 @@ class VPSManagementView(ui.View):
                 embed.add_field(name="Created", value=vps['created_at'], inline=True)
             
             await interaction.message.edit(embed=embed)
-            await interaction.followup.send("✅ StrengthCloud VPS stopped successfully!", ephemeral=True)
+            await interaction.followup.send("✅ Axytehost VPS stopped successfully!", ephemeral=True)
         except Exception as e:
             await interaction.followup.send(f"❌ Error stopping VPS: {str(e)}", ephemeral=True)
 
@@ -2273,7 +2270,7 @@ class VPSManagementView(ui.View):
                         # Send new SSH details to owner
                         try:
                             owner = await bot.fetch_user(int(vps["created_by"]))
-                            embed = discord.Embed(title=f"StrengthCloud VPS Restarted - {self.vps_id}", color=discord.Color.blue())
+                            embed = discord.Embed(title=f"Axytehost VPS Restarted - {self.vps_id}", color=discord.Color.blue())
                             embed.add_field(name="New SSH Session", value=f"```{ssh_session_line}```", inline=False)
                             await owner.send(embed=embed)
                         except:
@@ -2281,7 +2278,7 @@ class VPSManagementView(ui.View):
                 except:
                     pass
             
-            embed = discord.Embed(title=f"StrengthCloud VPS Management - {self.vps_id}", color=discord.Color.green())
+            embed = discord.Embed(title=f"Axytehost VPS Management - {self.vps_id}", color=discord.Color.green())
             embed.add_field(name="Status", value="🟢 Running", inline=True)
             
             if vps:
@@ -2293,7 +2290,7 @@ class VPSManagementView(ui.View):
                 embed.add_field(name="Restart Count", value=vps.get('restart_count', 0) + 1, inline=True)
             
             await interaction.message.edit(embed=embed, view=VPSManagementView(self.vps_id, container.id))
-            await interaction.followup.send("✅ StrengthCloud VPS restarted successfully! New SSH details sent to owner.", ephemeral=True)
+            await interaction.followup.send("✅ Axytehost VPS restarted successfully! New SSH details sent to owner.", ephemeral=True)
         except Exception as e:
             await interaction.followup.send(f"❌ Error restarting VPS: {str(e)}", ephemeral=True)
 
@@ -2355,7 +2352,7 @@ class OSSelectionView(ui.View):
             except Exception as e:
                 logger.error(f"Error removing old container: {e}")
 
-            status_msg = await interaction.followup.send("🔄 Reinstalling StrengthCloud VPS... This may take a few minutes.", ephemeral=True)
+            status_msg = await interaction.followup.send("🔄 Reinstalling Axytehost VPS... This may take a few minutes.", ephemeral=True)
             
             memory_bytes = vps['memory'] * 1024 * 1024 * 1024
 
@@ -2431,7 +2428,7 @@ class OSSelectionView(ui.View):
                     # Send new SSH details to owner
                     try:
                         owner = await bot.fetch_user(int(vps["created_by"]))
-                        embed = discord.Embed(title=f"StrengthCloud VPS Reinstalled - {self.vps_id}", color=discord.Color.blue())
+                        embed = discord.Embed(title=f"Axytehost VPS Reinstalled - {self.vps_id}", color=discord.Color.blue())
                         embed.add_field(name="New OS", value=image, inline=True)
                         embed.add_field(name="New SSH Session", value=f"```{ssh_session_line}```", inline=False)
                         embed.add_field(name="New SSH Password", value=f"||{ssh_password}||", inline=False)
@@ -2441,10 +2438,10 @@ class OSSelectionView(ui.View):
             except Exception as e:
                 logger.error(f"Warning: Failed to start tmate session: {e}")
 
-            await status_msg.edit(content="✅ StrengthCloud VPS reinstalled successfully!")
+            await status_msg.edit(content="✅ Axytehost VPS reinstalled successfully!")
             
             try:
-                embed = discord.Embed(title=f"StrengthCloud VPS Management - {self.vps_id}", color=discord.Color.green())
+                embed = discord.Embed(title=f"Axytehost VPS Management - {self.vps_id}", color=discord.Color.green())
                 embed.add_field(name="Status", value="🟢 Running", inline=True)
                 embed.add_field(name="Memory", value=f"{vps['memory']}GB", inline=True)
                 embed.add_field(name="CPU", value=f"{vps['cpu']} cores", inline=True)
@@ -2463,7 +2460,7 @@ class OSSelectionView(ui.View):
             except:
                 try:
                     channel = interaction.channel
-                    await channel.send(f"❌ Error reinstalling StrengthCloud VPS {self.vps_id}: {str(e)}")
+                    await channel.send(f"❌ Error reinstalling Axytehost VPS {self.vps_id}: {str(e)}")
                 except:
                     logger.error(f"Failed to send error message: {e}")
 
@@ -2532,10 +2529,10 @@ class TransferVPSModal(ui.Modal, title='Transfer VPS'):
 
             bot.db.update_vps(token, {"created_by": str(new_owner.id)})
 
-            await interaction.response.send_message(f"✅ StrengthCloud VPS {self.vps_id} has been transferred from {old_owner_name} to {new_owner_name}!", ephemeral=True)
+            await interaction.response.send_message(f"✅ Axytehost VPS {self.vps_id} has been transferred from {old_owner_name} to {new_owner_name}!", ephemeral=True)
             
             try:
-                embed = discord.Embed(title="StrengthCloud VPS Transferred to You", color=discord.Color.green())
+                embed = discord.Embed(title="Axytehost VPS Transferred to You", color=discord.Color.green())
                 embed.add_field(name="VPS ID", value=self.vps_id, inline=True)
                 embed.add_field(name="Previous Owner", value=old_owner_name, inline=True)
                 embed.add_field(name="Memory", value=f"{vps['memory']}GB", inline=True)
@@ -2572,7 +2569,7 @@ async def manage_vps(ctx, vps_id: str):
 
         status = vps['status'].capitalize()
 
-        embed = discord.Embed(title=f"StrengthCloud VPS Management - {vps_id}", color=discord.Color.blue())
+        embed = discord.Embed(title=f"Axytehost VPS Management - {vps_id}", color=discord.Color.blue())
         embed.add_field(name="Status", value=f"{status} (Container: {container_status})", inline=True)
         embed.add_field(name="Memory", value=f"{vps['memory']}GB", inline=True)
         embed.add_field(name="CPU", value=f"{vps['cpu']} cores", inline=True)
@@ -2614,10 +2611,10 @@ async def transfer_vps_command(ctx, vps_id: str, new_owner: discord.Member):
 
         bot.db.update_vps(token, {"created_by": str(new_owner.id)})
 
-        await ctx.send(f"✅ StrengthCloud VPS {vps_id} has been transferred from {ctx.author.name} to {new_owner.name}!")
+        await ctx.send(f"✅ Axytehost VPS {vps_id} has been transferred from {ctx.author.name} to {new_owner.name}!")
 
         try:
-            embed = discord.Embed(title="StrengthCloud VPS Transferred to You", color=discord.Color.green())
+            embed = discord.Embed(title="Axytehost VPS Transferred to You", color=discord.Color.green())
             embed.add_field(name="VPS ID", value=vps_id, inline=True)
             embed.add_field(name="Previous Owner", value=ctx.author.name, inline=True)
             embed.add_field(name="Memory", value=f"{vps['memory']}GB", inline=True)
@@ -2657,4 +2654,3 @@ if __name__ == "__main__":
     except Exception as e:
         logger.error(f"Bot crashed: {e}")
         traceback.print_exc()
-
