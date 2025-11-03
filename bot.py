@@ -49,8 +49,8 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 ADMIN_IDS = {int(id_) for id_ in os.getenv('ADMIN_IDS', '1210291131301101618').split(',') if id_.strip()}
 ADMIN_ROLE_ID = int(os.getenv('ADMIN_ROLE_ID', '1376177459870961694'))
-WATERMARK = "AltareHost VPS Service"
-WELCOME_MESSAGE = "Welcome To AltareHost! Get Started With Us!"
+WATERMARK = "StrengthCloud VPS Service"
+WELCOME_MESSAGE = "Welcome To StrengthCloud! Get Started With Us!"
 MAX_VPS_PER_USER = int(os.getenv('MAX_VPS_PER_USER', '3'))
 DEFAULT_OS_IMAGE = os.getenv('DEFAULT_OS_IMAGE', 'ubuntu:22.04')
 DOCKER_NETWORK = os.getenv('DOCKER_NETWORK', 'bridge')
@@ -809,7 +809,7 @@ async def on_ready():
 async def show_commands(ctx):
     """Show all available commands"""
     try:
-        embed = discord.Embed(title="🤖 AltareHost VPS Bot Commands", color=discord.Color.blue())
+        embed = discord.Embed(title="🤖 StrengthCloud VPS Bot Commands", color=discord.Color.blue())
         
         # User commands
         embed.add_field(name="User Commands", value="""
@@ -1106,10 +1106,10 @@ async def create_vps_command(ctx, memory: int, cpu: int, disk: int, owner: disco
                 embed.add_field(name="🔑 Root Password", value=f"||{root_password}||", inline=False)
             embed.add_field(name="🔒 Tmate Session", value=f"```{ssh_session_line}```", inline=False)
             embed.add_field(name="🔌 Direct SSH", value=f"```ssh {username}@<server-ip>```", inline=False)
-            embed.add_field(name="ℹ️ Note", value="This is a AltareHost VPS instance. You can install and configure additional packages as needed.", inline=False)
+            embed.add_field(name="ℹ️ Note", value="This is a StrengthCloud VPS instance. You can install and configure additional packages as needed.", inline=False)
             
             await owner.send(embed=embed)
-            await status_msg.edit(content=f"✅ AltareHost VPS creation successful! VPS has been created for {owner.mention}. Check your DMs for connection details.")
+            await status_msg.edit(content=f"✅ StrengthCloud VPS creation successful! VPS has been created for {owner.mention}. Check your DMs for connection details.")
         except discord.Forbidden:
             await status_msg.edit(content=f"❌ I couldn't send a DM to {owner.mention}. Please ask them to enable DMs from server members.")
             
